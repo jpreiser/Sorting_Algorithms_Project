@@ -13,7 +13,6 @@ void swap(int *index1, int *index2) {
 void selectionSort(int toSort[]) {
     int i, j, min_index;
     long count = 0;
-
     for (i = 0; i < 9999; i++) {
         min_index = i;
         for (j = i + 1; j < 10000; j++) {
@@ -21,9 +20,11 @@ void selectionSort(int toSort[]) {
             if (toSort[j] < toSort[min_index]) {
                 min_index = j;
             }
-            swap(&toSort[min_index], &toSort[i]);
         }
+        swap(&toSort[min_index], &toSort[i]);
     }
+
+    printValues(toSort, 10000);
     std::cout << "\t#Selection-sort comparisons: " << count << std::endl;
 
     return;
@@ -43,7 +44,7 @@ void selectionSort(int toSort[], int sortSize) {
             swap(&toSort[min_index], &toSort[i]);
         }
     }
-    std::cout << "1 2 3 4 5 ... " << toSort[sortSize - 1] << std::endl;
+    printValues(toSort, sortSize);
     std::cout << "\t#Selection-sort comparisons: " << count << std::endl;
 
     return;
@@ -51,8 +52,7 @@ void selectionSort(int toSort[], int sortSize) {
 
 }
 
-long merge(int toSort[], int leftFirst, int leftLast, int rightFirst, int rightLast) {
-    long comparison = 0;
+void merge(int toSort[], int leftFirst, int leftLast, int rightFirst, int rightLast, long *comparison) {
     int tempArray[10000];
     int index = leftFirst;
     int saveFirst = leftFirst;
@@ -64,7 +64,7 @@ long merge(int toSort[], int leftFirst, int leftLast, int rightFirst, int rightL
             tempArray[index] = toSort[rightFirst];
             rightFirst++;
         }
-        comparison++;
+        *comparison+=1;
         index++;
     }
 
@@ -81,34 +81,30 @@ long merge(int toSort[], int leftFirst, int leftLast, int rightFirst, int rightL
     for (index = saveFirst; index <= rightLast; index++) {
         toSort[index] = tempArray[index];
     }
-    return comparison;
+    return;
 } // merge
 
-long mergeSort(int toSort[], int first, int last) {
-    long comparison = 0;
+long* mergeSort(int toSort[], int first, int last, long *comparison) {
     if (first < last) {
         int middle = (first + last) / 2;
-        comparison = comparison + mergeSort(toSort, first, middle);
-        comparison = comparison + mergeSort(toSort, middle + 1, last);
-        comparison = comparison + merge(toSort, first, middle, middle + 1, last);
+        mergeSort(toSort, first, middle, comparison);
+        mergeSort(toSort, middle + 1, last, comparison);
+        merge(toSort, first, middle, middle + 1, last, comparison);
     }
-
     return comparison;
 } // full mergeSort
 
-long mergeSort(int toSort[], int sortSize) {
-    long comparison = 0;
+void mergeSort(int toSort[], int sortSize, long *comparison) {
     int first, last;
     first = 0; 
     last = sortSize - 1;
     if (first < last) {
         int middle = (first + last) / 2;
-        comparison = comparison + mergeSort(toSort, first, middle);
-        comparison = comparison + mergeSort(toSort, middle + 1, last);
-        comparison = comparison + merge(toSort, first, middle, middle + 1, last);
+        mergeSort(toSort, first, middle, comparison);
+        mergeSort(toSort, middle + 1, last, comparison);
+        merge(toSort, first, middle, middle + 1, last, comparison);
     }
-
-    return comparison;
+    return;
 } // experimental mergeSort
 
 long heapSort(int toSort[], int numValues) {
@@ -153,70 +149,102 @@ long ReheapDown(int toSort[], int root, int bottom) {
     return comparison;
 }
 
-int partition_low(int toSort[], int left, int right) {
-    int j, temp, i = left + 1;
-
-    for (j = left + 1; j < right; j++) {
-        if (toSort[j] <= toSort[left]) {
-            swap(&toSort[j], &toSort[left]);
-        }
-    }
-
-    temp = toSort[i-1];
-    toSort[i-1] = toSort[left];
-    toSort[left] = temp;
-    return i;
-}
-
-int partition_high(int toSort[], int left, int right) {
-    int pivot = toSort[right];
-    int i = (left - 1);
-
-    for (int j = left; j <= right - 1; j++) {
-        if (toSort[j] <= pivot) {
+int partition_low(int toSort[], int left, int right, long *comparison) {
+    int pivot = toSort[left];
+    int i = right + 1;
+    for (int j = right; j > left; j--) {
+        if(toSort[j] >= pivot) {
+            i--;
             swap(&toSort[i], &toSort[j]);
         }
+        *comparison+=1;
     }
-    swap(&toSort[i + 1], &toSort[right]);
-    return (i + 1);
+    swap(&toSort[left], &toSort[i-1]);
+    return i-1;
 }
 
-int rand_partition(int toSort[], int left, int right) {
+int partition_high(int toSort[], int left, int right, long *comparison) {
+    int pivot = toSort[right];
+    int i = left - 1;
+    for (int j = left; j < right; j++) {
+        if(toSort[j] <= pivot) {
+            i++;
+            swap(&toSort[i], &toSort[j]);
+        }
+        *comparison+=1;
+    }
+    swap(&toSort[i+1], &toSort[right]);
+    return(i + 1);
+}
+
+int rand_partition(int toSort[], int left, int right, long* comparison) {
     srand(time(NULL));
-    int random = left + rand() % (right - left);
-    swap(&toSort[random], &toSort[right]);
-    return partition_high(toSort, left, right);
+    int random = left + rand() % (right - left + 1);
+    swap(&toSort[random], &toSort[left]);
+    return partition_high(toSort, left, right, comparison);
 }
 
-long quickSortFP(int toSort[], int left, int right) {
-    long comparison = 0;
-    int count = 0;
-    if(left < right - 1) {
-        count = count + right - left - 1;
-        int q = partition_low(toSort, left, right);
-        comparison = count + comparison + quickSortFP(toSort, left, q-1);
-        comparison = count - 1 + comparison + quickSortFP(toSort, q + 1, right);
+long* quickSortFP(int toSort[], int left, int right, long *comparison) {
+    if(left < right) {
+        int q = partition_low(toSort, left, right, comparison);
+        quickSortFP(toSort, left, q-1, comparison);
+        quickSortFP(toSort, q + 1, right, comparison);
     }
     return comparison;
 }
 
-long quickSortRP(int toSort[], int left, int right) {
-    long comparison = 0;
-    int count = 0;
-    if(left < right - 1) {
-        int q = rand_partition(toSort, left, right);
-        comparison = count + comparison + quickSortRP(toSort, left, q - 1);
-        comparison = count - 1 + comparison + quickSortRP(toSort, q + 1, right);
+long* quickSortRP(int toSort[], int left, int right, long *comparison) {
+    if(left < right) {
+        int q = rand_partition(toSort, left, right, comparison);
+        quickSortRP(toSort, left, q - 1, comparison);
+        quickSortRP(toSort, q + 1, right, comparison);
     }
     return comparison;
 }
 
+void printValues(int toPrint[], int numToPrint) {
+    int i, j = 0;
+    for (i = 0; i < numToPrint; i++) {
+        std::cout << toPrint[i] << "\t";
+        j++;
+        if (j % 9 == 0) {
+            std::cout << "\n";
+        }
+    }
+    std::cout << "\n";
+}
 
-/* A function for taking input from the user for how many values of the list to sort before
-passing the array and input to the overloaded functions. */
-void experiments(int toSort[]) {
-    int nSorts;
-    while(1) {
+void fillRandomArray(int randomArray[], int size) {
+    srand(time(NULL));
+    for (int i = 0; i < size; i++) {
+        randomArray[i] = rand()%1000000;
+    } 
+}
+
+void shuffle(int arr[], int n) {
+    srand(time(NULL));
+    for (int i = n -1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        swap(&arr[i], &arr[j]);
+    }
+}
+
+/* A function that asks for the size of array to be generated, which is then created 
+and filled with random values between 0 and 1 000 000, then shuffled at the start of
+each loop so that the same sized array can be used for multiple experiments on the 
+same size of array. Can be called from any type of input, since it generates its own 
+random array. */
+void experiments() {
+    bool loop = true;
+    int eSize;
+    std::cout << "What size of array to create: ";
+    std::cin >> eSize;
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    int *eArray = new int[eSize];
+    fillRandomArray(eArray, eSize);
+    while(loop) {
+        shuffle(eArray, eSize); // shuffle the array to reuse.
         std::string type;
         std::cout << "selection-sort (s)   merge-sort (m)   heap-sort (h)   quick-sort-fp (q)\n";
         std::cout << "quick-sort-rp (r)   exit (x)" << std::endl;
@@ -225,51 +253,29 @@ void experiments(int toSort[]) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         if (type == "s") {
-            std::cout << "Enter the first n values to sort: ";
-            std::cin >> nSorts;
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            selectionSort(toSort, nSorts);
+            selectionSort(eArray, eSize);
         } else if (type == "m") {
-            std::cout << "Enter the first n values to sort: ";
-            std::cin >> nSorts;
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             long comparison = 0;
-            comparison = comparison + mergeSort(toSort, 0, nSorts);
-            std::cout << "1 2 3 4 5 ... " << toSort[nSorts] << std::endl;
+            comparison = *mergeSort(eArray, 0, eSize, &comparison);
             std::cout << "\t #Merge-sort number of comparisons: " << comparison << std::endl;
         } else if (type == "h") {
-            std::cout << "Enter the first n values to sort: ";
-            std::cin >> nSorts;
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             long comparison = 0;
-            comparison = heapSort(toSort, nSorts);
-            std::cout << "1 2 3 4 5 ... " << toSort[nSorts] << std::endl;
+            comparison = heapSort(eArray, eSize);
             std::cout << "\t #Heap-sort number of comparisons: " << comparison << std::endl;
         } else if (type == "q") {
-            std::cout << "Enter the first n values to sort: ";
-            std::cin >> nSorts;
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             long comparison = 0;
-            comparison = quickSortFP(toSort, 0, nSorts);
-            std::cout << "1 2 3 4 5 ... " << toSort[nSorts] << std::endl;
+            comparison = *quickSortFP(eArray, 0, eSize, &comparison);
             std::cout << "\t #Quick-sort-fp number of comparisons: " << comparison << std::endl;
         } else if (type == "r") {
-            std::cout << "Enter the first n values to sort: ";
-            std::cin >> nSorts;
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             long comparison = 0;
-            comparison = quickSortRP(toSort, 0, nSorts);
-            std::cout << "1 2 3 4 5 ... " << toSort[nSorts] << std::endl;
+            comparison = *quickSortRP(eArray, 0, eSize, &comparison);
             std::cout << "\t #Quick-sort-rp number of comparisons: " << comparison << std::endl;
         } else if (type == "x") {
-            return;    
+            exit(EXIT_SUCCESS);    
         } else {
-            std::cout << "Not a valid sorting algorithm.";
+            std::cout << "Not a valid sorting algorithm." << std::endl;
         }
     }
+    std::cout << "returning" << std::endl;
+    return;
 } // experiments 

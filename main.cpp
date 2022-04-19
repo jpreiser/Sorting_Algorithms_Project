@@ -49,29 +49,29 @@ int main (int argc, char *argv[]) {
         selectionSort(toSort);
     } else if (type == "m") {
         long comparison = 0;
-        comparison = comparison + mergeSort(toSort, 0, 10000);
-        std::cout << "1 2 3 4 5 ... " << toSort[9999] << std::endl;
+        comparison = *mergeSort(toSort, 0, 10000, &comparison);
+        printValues(toSort, 10000);
         std::cout << "\t #Merge-sort number of comparisons: " << comparison << std::endl;
     } else if (type == "h") {
         long comparison = 0;
         comparison = heapSort(toSort, 10000);
-        std::cout << "1 2 3 4 5 ... " << toSort[9999] << std::endl;
+        printValues(toSort, 10000);
         std::cout << "\t #Heap-sort number of comparisons: " << comparison << std::endl;
     } else if (type == "q") {
         long comparison = 0;
-        comparison = quickSortFP(toSort, 0, 10000);
-        std::cout << "1 2 3 4 5 ... " << toSort[9999] << std::endl;
+        comparison = *quickSortFP(toSort, 0, 10000, &comparison);
+        printValues(toSort, 10000);
         std::cout << "\t #Quick-sort-fp number of comparisons: " << comparison << std::endl;
     } else if (type == "r") {
         long comparison = 0;
-        comparison = quickSortRP(toSort, 0, 10000);
-        std::cout << "1 2 3 4 5 ... " << toSort[9999] << std::endl;
+        comparison = *quickSortRP(toSort, 0, 10000, &comparison);
+        printValues(toSort, 10000);
         std::cout << "\t #Quick-sort-rp number of comparisons: " << comparison << std::endl;
     } else if (type == "e") {
-        experiments(toSort);
+        experiments();
+        std::cout << "Back" << std::endl;
     } else {
         std::cout << "Not a valid sorting algorithm." << std::endl;
     }
-
-    return 0;
+    return EXIT_SUCCESS;
 } // main
