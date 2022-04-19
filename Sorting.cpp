@@ -221,6 +221,7 @@ void fillRandomArray(int randomArray[], int size) {
     } 
 }
 
+/* Shuffle using the Fisher-Yates shuffle algorithm. */
 void shuffle(int arr[], int n) {
     srand(time(NULL));
     for (int i = n -1; i > 0; i--) {
@@ -237,14 +238,14 @@ random array. */
 void experiments() {
     bool loop = true;
     int eSize;
-    std::cout << "What size of array to create: ";
+    std::cout << "Size of array to create: ";
     std::cin >> eSize;
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     int *eArray = new int[eSize];
     fillRandomArray(eArray, eSize);
     while(loop) {
-        shuffle(eArray, eSize); // shuffle the array to reuse.
+        shuffle(eArray, eSize); // shuffle the array to reuse each loop.
         std::string type;
         std::cout << "selection-sort (s)   merge-sort (m)   heap-sort (h)   quick-sort-fp (q)\n";
         std::cout << "quick-sort-rp (r)   exit (x)" << std::endl;

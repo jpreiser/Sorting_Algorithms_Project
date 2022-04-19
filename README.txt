@@ -10,7 +10,8 @@ To clean the directory, type 'make clean' in the command line.
 
 The program runs with input names of 'ordered.txt', 'random.txt', and 'reverse.txt'.
 To customize input, modify these files directly or replace them with files of the same name.
-These files and this program assumes inputs of size 10,000 or less, while the experimental
+
+These files and this program assumes inputs of size 10,000, while the experimental
 section can create arrays of up to 1,000,000. There is a bug with merge sort that prevents
 it from going above 10000 that I ran out of time to fix. 
 
