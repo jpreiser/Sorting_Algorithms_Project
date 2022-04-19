@@ -6,39 +6,44 @@
 #include <limits>
 #include <iterator>
 
+/* Method for swapping elements in arrays. */
+void swap(int *index1, int *index2);
+
 /* An implementation of selection sort.*/
 void selectionSort(int toSort[]);
 
 /* An overlad implementation of selection sort using the first n values specified by the user. */
 void selectionSort(int toSort[], int sortSize);
 
-/* An implementation of merge sort*/
-void mergeSort(int toSort[]);
+/* A function for use by merge sort to merge the arrays. */
+long merge(int toSort[], int leftFirst, int leftLast, int rightFirst, int rightLast);
 
+/* An implementation of merge sort*/
+long mergeSort(int toSort[], int left, int right);
 
 /* An overlad implementation of merge sort using the first n values specified by the user. */
-void mergeSort(int toSort[], int sortSize);
+long mergeSort(int toSort[], int sortSize);
 
 /* An implementation of heap sort*/
-void heapSort(int toSort[]);
+long heapSort(int toSort[], int numValues);
 
+/* Function for reconstructing a heap after swaps have taken place. */
+long ReheapDown(int toSort[], int root, int bottom);
 
-/* An overlad implementation of heap sort using the first n values specified by the user. */
-void heapSort(int toSort[], int sortSize);
+/* A method that creates the partition for a given quicksort. */
+int partition_low(int toSort[], int left, int right);
+
+/* Another method for partitioning for a quicksort. */
+int partition_high(int toSort[], int left, int right);
+
+/* A method for generating random pivots for partitions. */
+int rand_partition(int toSort[], int left, int right);
 
 /* An implementation of quicksort with the first value as the pivot. */
-void quickSortFP(int toSort[]);
-
-/* An overlad implementation of quicksort with the first value as the pivot,
-using the first n values specified by the user. */
-void quickSortFP(int toSort[], int sortSize);
+long quickSortFP(int toSort[], int left, int right);
 
 /* An implementation of quicksort using a random pivot.*/
-void quickSortRP(int toSort[]);
-
-/* An overlad implementation of quicksort with a ranbom pivot,
-using the first n values specified by the user. */
-void quickSortRP(int toSort[], int sortSize);
+long quickSortRP(int toSort[], int low, int high);
 
 /* A function for taking input from the user for how many values of the list to sort before
 passing the array and input to the overloaded functions. */
