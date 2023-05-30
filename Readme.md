@@ -1,7 +1,3 @@
-Jacob Reiser
-jpreiser@uga.edu
-810 687 011
-
 To compile the code, type 'make' into the command line.
 
 To run, type './main <input file>' into the command line.
